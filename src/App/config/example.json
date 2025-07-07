@@ -1,0 +1,7 @@
+{
+    "app.name": "KiwiQuill",
+    "app.version": "25.0.0",
+    "kaphpir.settings": {
+        "response.metadata.response_id.enabled": false
+    }
+}

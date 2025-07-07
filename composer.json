@@ -1,0 +1,34 @@
+{
+    "name": "miakiwi/kiwiquill",
+    "description": "A PHP API for publishing blog posts.",
+    "type": "project",
+    "require": {
+        "miakiwi/kaphpir": "dev-main",
+        "pecee/simple-router": "^5.4",
+        "rakit/validation": "^1.4",
+        "catfan/medoo": "^2.2",
+        "vlucas/phpdotenv": "^5.6",
+        "monolog/monolog": "^3.9",
+        "symfony/yaml": "^7.3"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/MiaKiwi/kaphpir"
+        }
+    ],
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Miakiwi\\Kiwiquill\\": "src/",
+            "Framework\\": "src/Framework/",
+            "App\\": "src/App/"
+        }
+    },
+    "authors": [
+        {
+            "name": "mia.kiwi",
+            "email": "iwik.aim@mia.kiwi"
+        }
+    ]
+}

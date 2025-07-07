@@ -1,0 +1,7 @@
+vendor/
+database/
+logs/
+posts/
+
+.env
+config.json
