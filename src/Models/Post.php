@@ -2,6 +2,7 @@
 
 namespace Miakiwi\Kiwiquill\Models;
 
+use Cocur\Slugify\Slugify;
 use Miakiwi\Kiwiquill\PostMetadata;
 use MiaKiwi\Kaphpir\IData;
 use Miakiwi\Kiwiquill\Slugificator;
@@ -11,12 +12,10 @@ use Miakiwi\Kiwiquill\Slugificator;
 class Post implements IData
 {
     /**
-     * The path to the post file.
+     * The URL path of the post file.
      * @var string
      */
     protected readonly string $path;
-
-
 
     /**
      * The raw content of the post file.
@@ -34,13 +33,14 @@ class Post implements IData
 
     /**
      * Instantiate a new Post object.
-     * @param string[] $path The path to the post file.
+     * @param string $path The URL path to the post file.
      * @param string $raw_content The raw content of the post file.
      * @param mixed $metadata The metadata for the post.
      */
-    public function __construct(array $path, string $raw_content, ?PostMetadata $metadata = null)
+    public function __construct(string $path, string $raw_content, ?PostMetadata $metadata = null)
     {
-        $this->path = Slugificator::slugifyPath($path);
+        // Set the path to the post file using the slugificator.
+        $this->path = Slugificator::slugify($path);
 
         $this->raw_content = $raw_content;
 
@@ -93,6 +93,13 @@ class Post implements IData
 
         // Create a new PostMetadata object from the header.
         $this->metadata = PostMetadata::parseFromYaml($header);
+
+
+
+        // If it isn't already set, set the URL path to the post file in the metadata.
+        if (!$this->metadata->get('path', false)) {
+            $this->metadata->add('path', $this->getPath());
+        }
     }
 
 
@@ -152,11 +159,11 @@ class Post implements IData
 
     /**
      * Parse a raw content string into a Post object.
-     * @param array $path The path to the post file as an array of strings.
+     * @param string $path The URL path to the post file.
      * @param string $raw_content The raw content of the post file.
      * @return Post The Post object with the parsed content and metadata.
      */
-    public static function parse(array $path, string $raw_content): static
+    public static function parse(string $path, string $raw_content): static
     {
         // Create a new Post object with the raw content.
         $post = new static($path, $raw_content);

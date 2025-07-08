@@ -2,6 +2,7 @@
 
 namespace Miakiwi\Kiwiquill\Containers;
 
+use Exception;
 use Framework\Logger;
 use Miakiwi\Kiwiquill\Exceptions\PostsContainerCreationException;
 use Miakiwi\Kiwiquill\Exceptions\PostsContainerWriteException;
@@ -36,27 +37,6 @@ class FSPostsContainer implements PostsContainerInterface
 
         // Set the file where the index of posts is stored.
         $this->setIndexFile($index_file);
-    }
-
-
-
-    /**
-     * Get the URL path to a post file based on its filesystem path.
-     * @param string $fs_path The filesystem path to the post file.
-     * @return string The URL path to the post file.
-     */
-    public function getUrlPath(string $fs_path): string
-    {
-        // Get the path relative to the posts directory.
-        $relativePath = str_replace($this->getDirectory(), '', $fs_path);
-
-        // Ensure the relative path does not start with a forward slash.
-        if (str_starts_with($relativePath, '/')) {
-            $relativePath = substr($relativePath, 1); // Remove the leading slash.
-        }
-
-        // Return the URL path to the post file.
-        return $relativePath;
     }
 
 
@@ -149,6 +129,49 @@ class FSPostsContainer implements PostsContainerInterface
 
 
     /**
+     * Get the path of a post file relative to the posts directory.
+     * @param string $path The absolute path to the post file.
+     * @throws \InvalidArgumentException if the provided path is not valid or not in the posts directory.
+     * @return string The relative path to the post file, starting with a directory separator.
+     */
+    public function getFsPathRelativeToDirectory(string $path): string
+    {
+        // Ensure the path is absolute.
+        $absolutePath = realpath($path);
+
+        // If the path is not absolute, throw an exception.
+        if ($absolutePath === false) {
+            throw new \InvalidArgumentException("The provided path is not valid: $path");
+        }
+
+
+
+        // Remove the directory part from the absolute path to get the relative path.
+        $relativePath = str_replace($this->getDirectory(), '', $absolutePath);
+
+
+
+        // If the path isn't in the directory, throw an exception.
+        if ($relativePath === $absolutePath || !str_starts_with($absolutePath, $this->getDirectory())) {
+            throw new \InvalidArgumentException("The provided path is not in the posts directory: $path");
+        }
+
+
+
+        // Ensure the relative path starts with a directory separator.
+        if (!str_starts_with($relativePath, DIRECTORY_SEPARATOR)) {
+            $relativePath = DIRECTORY_SEPARATOR . $relativePath;
+        }
+
+
+
+        // Return the relative path to the post file.
+        return $relativePath;
+    }
+
+
+
+    /**
      * Set and create the directory where the posts are stored.
      * @param string $directory The directory where the posts are stored.
      * @throws \Miakiwi\Kiwiquill\Exceptions\PostsContainerCreationException if the directory cannot be created.
@@ -213,6 +236,31 @@ class FSPostsContainer implements PostsContainerInterface
                 throw new PostsContainerWriteException("Failed to write index file: " . $indexFile);
             }
         }
+    }
+
+
+
+    /**
+     * Get the URL path to a post file from its filesystem path.
+     * @param string $fs_path The absolute filesystem path to the post file.
+     * @return string The URL path to the post file, relative to the posts directory.
+     */
+    public function getUrlPathFromFsPath(string $fs_path): string
+    {
+        // Get the relative path to the post file from the posts directory.
+        $relativePath = $this->getFsPathRelativeToDirectory($fs_path);
+
+        // Remove the file extension from the relative path.
+        $relativePathWithoutExtension = preg_replace('/\.[^.]+$/', '', $relativePath);
+
+        // Convert the relative path to a URL path by replacing directory separators with slashes.
+        $urlPath = str_replace(DIRECTORY_SEPARATOR, '/', $relativePathWithoutExtension);
+
+        // Remove leading slashes from the URL path.
+        $urlPath = ltrim($urlPath, '/');
+
+        // Return the URL path to the post file.
+        return $urlPath;
     }
 
 
@@ -294,12 +342,6 @@ class FSPostsContainer implements PostsContainerInterface
 
     public function getPosts(): array
     {
-        // Initialize an empty array to hold the posts.
-        $posts = [];
-
-
-
-
         // Get all the posts in the posts directory recursively.
         $posts = [];
 
@@ -314,15 +356,28 @@ class FSPostsContainer implements PostsContainerInterface
             }
 
             // Add the post to the array.
-            $post = new Post(
-                explode('/', $this->getUrlPath($file->getPathname())),
-                file_get_contents($file->getPathname())
-            );
+            try {
 
-            // Add the FS path to the post metadata
-            $post?->metadata?->add('secret_fs_path', $file->getPathname());
+                $post = new Post(
+                    $this->getUrlPathFromFsPath($file->getPathname()),
+                    file_get_contents($file->getPathname())
+                );
 
-            $posts[] = $post;
+                // Add the FS path to the post metadata
+                $post?->metadata?->add('secret_fs_path', $file->getPathname());
+
+                $posts[] = $post;
+
+            } catch (Exception $e) {
+
+                // Log the error if the post cannot be created.
+                Logger::get()->error("Failed to create post from file: " . $file->getPathname(), [
+                    'container' => static::class,
+                    'exception' => $e,
+                    'file' => $file->getPathname()
+                ]);
+
+            }
         }
 
 
@@ -339,8 +394,9 @@ class FSPostsContainer implements PostsContainerInterface
         $indexedPath = $this->getIndexedPostFsPath('id', $id);
 
         if ($indexedPath) {
+            // Add the post to the array.
             return new Post(
-                explode('/', $this->getUrlPath($indexedPath)),
+                $this->getUrlPathFromFsPath($indexedPath),
                 file_get_contents($indexedPath)
             );
         }
@@ -375,8 +431,9 @@ class FSPostsContainer implements PostsContainerInterface
         $indexedPath = $this->getIndexedPostFsPath('path', $path);
 
         if ($indexedPath) {
+            // Add the post to the array.
             return new Post(
-                explode('/', $this->getUrlPath($indexedPath)),
+                $this->getUrlPathFromFsPath($indexedPath),
                 file_get_contents($indexedPath)
             );
         }
@@ -390,7 +447,7 @@ class FSPostsContainer implements PostsContainerInterface
             // If the post's path matches the provided path, return the post.
             if ($post->getPath() === $path) {
                 // Index the post for future reference.
-                $this->indexPost('path', $path, $post->getPath());
+                $this->indexPost('path', $path, $post?->metadata?->get('secret_fs_path'));
                 return $post;
             }
         }

@@ -11,23 +11,13 @@ use MiaKiwi\Kaphpir\Errors\Http\NotFound;
 use MiaKiwi\Kaphpir\Errors\Http\Unauthorized;
 use MiaKiwi\Kaphpir\Responses\v25_1_0\Response;
 use MiaKiwi\Kaphpir\ResponseSerializer\JsonSerializer;
-use Miakiwi\Kiwiquill\Containers\FSPostsContainer;
 use Pecee\Http\Request;
 use Pecee\SimpleRouter\SimpleRouter;
 
 
 
-SimpleRouter::get('/', function () {
-    ?>
-    <pre><?php
-    $fs_container = new FSPostsContainer($_ENV['POSTS_DIRECTORY']);
-
-
-    // print_r($fs_container->getPosts());
-    // print_r($fs_container->getPostById("001")->getPath());
-    // print_r($fs_container->getPostsByTitle("API Authentication Guide")[0]->getKapirValue());
-    // print_r($fs_container->getPostByPath("notes.md")?->getKapirValue());
-});
+// Include APIv1 routes
+include_once __DIR__ . DIRECTORY_SEPARATOR . 'Routes' . DIRECTORY_SEPARATOR . 'APIv1.php';
 
 
 

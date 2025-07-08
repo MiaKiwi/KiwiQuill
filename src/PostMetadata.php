@@ -106,6 +106,18 @@ class PostMetadata implements IData
         // Force the key to be lowercase.
         $key = strtolower($key);
 
+
+
+        // If the key is 'id' and the value contains spaces, log a warning.
+        if ($key === 'id' && is_string($value) && str_contains($value, ' ')) {
+            Logger::get()->warning("The 'id' metadata key should not contain spaces.", [
+                'key' => $key,
+                'value' => $value
+            ]);
+        }
+
+
+
         $this->metadata[$key] = $value;
     }
 
@@ -188,7 +200,7 @@ class PostMetadata implements IData
     {
         // Return the metadata attributes whose key does not start with 'secret'.
         return array_filter($this->metadata, function ($key) {
-            return !str_starts_with('secret', $key);
+            return !str_starts_with($key, 'secret');
         }, ARRAY_FILTER_USE_KEY);
     }
 

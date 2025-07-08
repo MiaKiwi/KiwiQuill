@@ -12,7 +12,7 @@ class Slugificator
      * @param string $divider The character to use as a divider in the slug (default is '-').
      * @return string The slugified version of the input text.
      * 
-     * https://stackoverflow.com/a/2955878
+     * Adapted from https://stackoverflow.com/a/2955878 to preserve file extensions and URL path separators.
      */
     public static function slugify($text, string $divider = '-')
     {
@@ -26,13 +26,13 @@ class Slugificator
         }
 
         // replace non letter or digits by divider
-        $text = preg_replace('~[^\pL\d]+~u', $divider, $text);
+        $text = preg_replace('~[^\pL\d/]+~u', $divider, $text);
 
         // transliterate
         $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
 
         // remove unwanted characters
-        $text = preg_replace('~[^-\w]+~', '', $text);
+        $text = preg_replace('~[^-\w/]+~', '', $text);
 
         // trim
         $text = trim($text, $divider);

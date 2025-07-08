@@ -13,3 +13,9 @@ and this project adheres to [STVP](https://mia.kiwi/projects/stvp).
 - Slugificator
 - Post metadata class
 - Post container interface
+- Default post container type 'filesystem'
+- README file
+- A warning when a post ID contains spaces
+- Logging level and config loading in the app bootstrap
+- APIv1 routes
+- Posts controller
