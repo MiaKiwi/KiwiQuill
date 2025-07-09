@@ -72,6 +72,12 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . 'Routes.php';
 
 
 
+// Configure CORS
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET'); // Allow only GET requests since this is a read-only API
+
+
+
 // Start the router
 Logger::get()->debug("---------- Received request ----------", [
     'method' => $_SERVER['REQUEST_METHOD'],

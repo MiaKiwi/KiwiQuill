@@ -7,6 +7,8 @@
       - [Get a specific post by path](#get-a-specific-post-by-path)
       - [Get only the metadata about a post](#get-only-the-metadata-about-a-post)
       - [Get a specific post by its identifier](#get-a-specific-post-by-its-identifier)
+      - [Searching for posts](#searching-for-posts)
+    - [API pagination](#api-pagination)
     - [Adding new post container types](#adding-new-post-container-types)
 
 
@@ -168,6 +170,57 @@ If no post with that identifier is found, a `NOT_FOUND` error is returned:
 }
 ```
 
+#### Searching for posts
+
+You can use the `/api/v1/posts/search` endpoint to perform search operations and find posts based on your criteria.
+
+Currently, the possible search parameters are:
+
+| Name     | Format                    | Matches                                          |
+| -------- | ------------------------- | ------------------------------------------------ |
+| `tags`   | `?tags=tag1,tag2,tag3...` | All posts that have any of the tags in the list. |
+| `title`  | `?title=...`              | All posts with that title.                       |
+| `author` | `?author=...`             | All posts from that author                       |
+
+These parameters can be combined to narrow your searches. For example:
+
+```
+GET /api/v1/posts/search?tags=recipe,blog&author=John
+```
+
+Returns all posts by John with the tags "recipe" or "blog".
+
+### API pagination
+
+You can specify pagination parameters to the API to select only a range of posts. The pagination parameters are `limit`, which defines how many posts you want to get, and `offset`, that specifies from which result index the limit starts. Effectively, this allows you to select the "page" number and the number of "rows".
+
+The `limit` parameter must be an integer greater than zero, but lesser or equal to 100, and the `offset` must be a positive integer.
+
+Paginated results include some additional data in the metadata member of the KAPIR response:
+
+```json
+{
+    "status": "error",
+    "version": "25.1.0",
+    "data": [...],
+    "message": "Posts retrieved successfully!",
+    "error": null,
+    "meta": {
+        "pagination": {
+            "offset": 0,
+            "limit": 100,
+            "total": 6,
+            "has_more": false,
+            "next_offset": null,
+            "previous_offset": null
+        },
+        "response_time": "2025-07-09 16:28:20+02:00"
+    }
+}
+```
+
+The `has_more` member indicates if there are more posts on the next offset, the `total` member shows how many posts there are in total (not only in the response), and the `next_`/`previous_offset` members show the offset that corresponds to the previous or next "page".
+
 ### Adding new post container types
 
-Developers can create their own post container types by implementing the `\Miakiwi\Kiwiquill\Container\PostsContainerInterface`. By default, KiwiQuill is distributed with a file system container, but you are free to use your own.
+Developers can create their own post container types by implementing the `PostsContainerInterface`. By default, KiwiQuill is distributed with a file system container, but you are free to use your own.
