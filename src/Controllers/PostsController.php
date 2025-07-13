@@ -74,14 +74,14 @@ class PostsController
         ];
 
         // Slice the posts array for pagination.
-        $paginatedPosts = array_slice($posts, $offset, $limit);
+        $paginated_posts = array_slice($posts, $offset, $limit);
 
 
 
         // Convert the posts to their KAPIR value representation.
         $data = array_map(function ($post) {
             return $post->getKapirValue();
-        }, $paginatedPosts);
+        }, $paginated_posts);
 
 
 
@@ -412,14 +412,14 @@ class PostsController
         ];
 
         // Slice the posts array for pagination.
-        $paginatedPosts = array_slice($posts, $offset, $limit);
+        $paginated_posts = array_slice($posts, $offset, $limit);
 
 
 
         // Convert the posts to their KAPIR value representation.
         $data = array_map(function ($post) {
             return $post->getKapirValue();
-        }, $paginatedPosts);
+        }, $paginated_posts);
 
 
 

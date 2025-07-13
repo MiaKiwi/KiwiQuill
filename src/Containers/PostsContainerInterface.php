@@ -77,4 +77,21 @@ interface PostsContainerInterface
      * @return \Miakiwi\Kiwiquill\Models\Post[] The posts with the specified last update date.
      */
     public function getPostsByUpdateDate(DateTime $date): array;
+
+
+
+    /**
+     * Get all unique tags from the posts in the container.
+     * @return string[] An array of unique tags found in the posts.
+     */
+    public function getTags(): array;
+
+
+
+    /**
+     * Check if a tag exists in the container.
+     * @param string $tag The tag to check for existence.
+     * @return bool True if the tag exists, false otherwise.
+     */
+    public function tagExists(string $tag): bool;
 }

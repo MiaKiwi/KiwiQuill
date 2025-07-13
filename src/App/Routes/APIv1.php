@@ -3,6 +3,7 @@
 namespace App\Routes;
 
 use Miakiwi\Kiwiquill\Controllers\PostsController;
+use Miakiwi\Kiwiquill\Controllers\TagsController;
 use Pecee\SimpleRouter\SimpleRouter;
 
 
@@ -36,4 +37,20 @@ SimpleRouter::group([
 
     // --- Get a specific post by path --- \\
     SimpleRouter::get($_ENV['API_ROOT'] . 'v1/posts/{path}', [PostsController::class, 'show']);
+});
+
+
+
+// ----- APIv1 Tags ----- \\
+SimpleRouter::group([
+    'defaultParameterRegex' => '[\w\-\.\/]+' // Allow alphanumeric, hyphen, dots, and forward slashes in tag paths
+], function () {
+
+
+
+    // --- List all tags --- \\
+    SimpleRouter::get($_ENV['API_ROOT'] . 'v1/tags', [TagsController::class, 'index']);
+
+
+
 });

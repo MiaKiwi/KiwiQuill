@@ -19,3 +19,4 @@ and this project adheres to [STVP](https://mia.kiwi/projects/stvp).
 - Logging level and config loading in the app bootstrap
 - APIv1 routes
 - Posts controller
+- Tags controller

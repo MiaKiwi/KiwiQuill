@@ -172,6 +172,12 @@ class PostMetadata implements IData
      */
     public function add(string $key, mixed $value): static
     {
+        // If the value is a DateTime object, convert it to a string.
+        if ($value instanceof \DateTime) {
+            $value = $value->format("Y-m-d\TH:i:sP");
+        }
+
+
         $this->addMetadatum($key, $value);
 
         return $this;
@@ -209,6 +215,7 @@ class PostMetadata implements IData
     /**
      * Get the special 'id' metadata attribute.
      * @param mixed $default The default value to return if the key does not exist.
+     * @return string|null The ID of the post or null if not set.
      */
     public function getId(?string $default = null): ?string
     {
@@ -220,6 +227,7 @@ class PostMetadata implements IData
     /**
      * Get the special 'title' metadata attribute.
      * @param mixed $default The default value to return if the key does not exist.
+     * @return string|null The title of the post or null if not set.
      */
     public function getTitle(?string $default = null): ?string
     {
@@ -231,6 +239,7 @@ class PostMetadata implements IData
     /**
      * Get the special 'description' metadata attribute.
      * @param mixed $default The default value to return if the key does not exist.
+     * @return string|null The description of the post or null if not set.
      */
     public function getDescription(?string $default = null): ?string
     {
@@ -242,6 +251,7 @@ class PostMetadata implements IData
     /**
      * Get the special 'author' metadata attribute.
      * @param mixed $default The default value to return if the key does not exist.
+     * @return string|null The author of the post or null if not set.
      */
     public function getAuthor(?string $default = null): ?string
     {
@@ -253,6 +263,7 @@ class PostMetadata implements IData
     /**
      * Get the special 'image' metadata attribute.
      * @param mixed $default The default value to return if the key does not exist.
+     * @return string|null The image URI of the post or null if not set.
      */
     public function getImage(?string $default = null): ?string
     {
@@ -264,8 +275,9 @@ class PostMetadata implements IData
     /**
      * Get the special 'tags' metadata attribute.
      * @param mixed $default The default value to return if the key does not exist.
+     * @return array An array of tags.
      */
-    public function getTags(?array $default = []): ?array
+    public function getTags(array $default = []): array
     {
         return $this->getMetadatum('tags', $default);
     }
@@ -273,10 +285,11 @@ class PostMetadata implements IData
 
 
     /**
-     * Get the special 'publicationdate' metadata attribute.
-     * @param mixed $default The default value to return if the key does not exist.
+     * Get the special 'date_published' metadata attribute.
+     * @param null|\DateTime $default The default value to return if the key does not exist.
+     * @return \DateTime|null The publication date as a DateTime object or null if not set.
      */
-    public function getPublicationDate(?string $default = null): ?string
+    public function getPublicationDate(?\DateTime $default = null): ?\DateTime
     {
         return $this->getMetadatum('date_published', $default);
     }
@@ -284,10 +297,11 @@ class PostMetadata implements IData
 
 
     /**
-     * Get the special 'updatedate' metadata attribute.
-     * @param mixed $default The default value to return if the key does not exist.
+     * Get the special 'date_updated' metadata attribute.
+     * @param null|\DateTime $default The default value to return if the key does not exist.
+     * @return \DateTime|null The update date as a DateTime object or null if not set.
      */
-    public function getUpdateDate(?string $default = null): ?string
+    public function getUpdateDate(?\DateTime $default = null): ?\DateTime
     {
         return $this->getMetadatum('date_updated', $default);
     }
@@ -296,7 +310,16 @@ class PostMetadata implements IData
 
     public function getKapirValue(): array
     {
-        return $this->getPublicMetadata();
+        $meta = $this->getPublicMetadata();
+
+        // Convert dates to ISO 8601 format.
+        foreach ($meta as $key => $value) {
+            if ($value instanceof \DateTime || $value instanceof \DateTimeImmutable) {
+                $meta[$key] = $value->format("Y-m-d\TH:i:sP");
+            }
+        }
+
+        return $meta;
     }
 
 
@@ -309,7 +332,7 @@ class PostMetadata implements IData
     public static function parseFromYaml(string $yaml): static
     {
         // Parse the YAML string into an associative array.
-        $data = Yaml::parse($yaml, Yaml::PARSE_OBJECT);
+        $data = Yaml::parse($yaml, Yaml::PARSE_OBJECT | Yaml::PARSE_DATETIME);
 
 
 

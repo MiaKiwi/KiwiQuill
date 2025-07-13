@@ -579,4 +579,46 @@ class FSPostsContainer implements PostsContainerInterface
         // Return the array of posts that match the specified update date.
         return $matchingPosts;
     }
+
+
+
+    public function getTags(): array
+    {
+        // Get all the posts in the container.
+        $posts = $this->getPosts();
+
+
+
+        // Initialize an array to hold unique tags.
+        $tags = [];
+
+        foreach ($posts as $post) {
+            foreach ($post->metadata->getTags() as $tag) {
+                // Add the tag to the array if it is not already present.
+                if (!in_array($tag, $tags)) {
+                    $tags[] = $tag;
+                }
+            }
+        }
+
+        // Sort the tags alphabetically.
+        sort($tags);
+
+
+
+        // Return the array of unique tags.
+        return $tags;
+    }
+
+
+
+    public function tagExists(string $tag): bool
+    {
+        // Get all the tags in the container.
+        $tags = $this->getTags();
+
+
+
+        return in_array($tag, $tags); // Check if the specified tag exists in the tags array.
+    }
 }
