@@ -2,6 +2,7 @@
   - [Posts](#posts)
     - [Reserved metadata attributes](#reserved-metadata-attributes)
   - [Developer stuff (scary)](#developer-stuff-scary)
+    - [RSS Feed](#rss-feed)
     - [API routes](#api-routes)
       - [List all posts](#list-all-posts)
       - [Get a specific post by path](#get-a-specific-post-by-path)
@@ -58,6 +59,14 @@ KiwiQuill has some special metadata attributes it can use to help filter your po
 - `date_updated`: The date of the last revision.
 
 ## Developer stuff (scary)
+
+### RSS Feed
+
+An RSS feed is available at the endpoint `/feed`.
+
+The raw endpoint contains a global channel that serves all the posts in the container, but you can append a tag name like such: `/feed/{tag}` to show a channel specific to that tag.
+
+For example, `/feed/cooking` will show all the posts that have the "cooking" tag.
 
 ### API routes
 

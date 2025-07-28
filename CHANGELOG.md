@@ -20,3 +20,4 @@ and this project adheres to [STVP](https://mia.kiwi/projects/stvp).
 - APIv1 routes
 - Posts controller
 - Tags controller
+- RSS feed endpoint

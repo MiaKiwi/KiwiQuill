@@ -287,9 +287,9 @@ class PostMetadata implements IData
     /**
      * Get the special 'date_published' metadata attribute.
      * @param null|\DateTime $default The default value to return if the key does not exist.
-     * @return \DateTime|null The publication date as a DateTime object or null if not set.
+     * @return \DateTimeImmutable|null The publication date as a DateTime object or null if not set.
      */
-    public function getPublicationDate(?\DateTime $default = null): ?\DateTime
+    public function getPublicationDate(?\DateTime $default = null): ?\DateTimeImmutable
     {
         return $this->getMetadatum('date_published', $default);
     }
@@ -299,9 +299,9 @@ class PostMetadata implements IData
     /**
      * Get the special 'date_updated' metadata attribute.
      * @param null|\DateTime $default The default value to return if the key does not exist.
-     * @return \DateTime|null The update date as a DateTime object or null if not set.
+     * @return \DateTimeImmutable|null The update date as a DateTime object or null if not set.
      */
-    public function getUpdateDate(?\DateTime $default = null): ?\DateTime
+    public function getUpdateDate(?\DateTime $default = null): ?\DateTimeImmutable
     {
         return $this->getMetadatum('date_updated', $default);
     }
