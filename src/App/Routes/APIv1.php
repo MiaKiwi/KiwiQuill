@@ -20,13 +20,18 @@ SimpleRouter::group([
 
 
 
+    // --- List metadata of all posts --- \\
+    SimpleRouter::get($_ENV['API_ROOT'] . 'v1/posts/metadata', [PostsController::class, 'indexMetadata']);
+
+
+
     // --- Get a specific post by its ID --- \\
     SimpleRouter::get($_ENV['API_ROOT'] . 'v1/posts/id/{id}', [PostsController::class, 'showById']);
 
 
 
     // --- Search for posts --- \\
-    SimpleRouter::get($_ENV['API_ROOT'] . 'v1/posts/search', [PostsController::class, 'search']);
+    SimpleRouter::get($_ENV['API_ROOT'] . 'v1/posts/search/{path?}', [PostsController::class, 'search']);
 
 
 

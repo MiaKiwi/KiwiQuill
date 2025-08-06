@@ -293,4 +293,22 @@ class Post implements IData
             'metadata' => $meta
         ];
     }
+
+
+
+    public function __toString(): string
+    {
+        // If the post has an ID, return the ID.
+        if ($this->metadata->getId(false)) {
+            return $this->metadata->getId();
+        }
+
+        // If the post has a title, return the title.
+        if ($this->getTitle()) {
+            return $this->getTitle();
+        }
+
+        // Otherwise, return the path to the post file.
+        return $this->getPath();
+    }
 }

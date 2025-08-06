@@ -5,7 +5,9 @@ namespace Miakiwi\Kiwiquill\Controllers;
 use Framework\Config;
 use Framework\Logger;
 use Lukaswhite\FeedWriter\RSS2;
+use MiaKiwi\Kaphpir\ApiResponse\HttpApiResponse;
 use MiaKiwi\Kaphpir\Responses\v25_1_0\Response;
+use MiaKiwi\Kaphpir\ResponseSerializer\JsonSerializer;
 use Miakiwi\Kiwiquill\Containers\FSPostsContainer;
 use Miakiwi\Kiwiquill\Exceptions\PostsContainerNotFoundError;
 
@@ -113,6 +115,11 @@ class FeedController
                     (new Response())->error(new PostsContainerNotFoundError())->message("Internal server error: Posts container not found.")
                 );
         }
+
+
+
+        // Decode the tag to ensure it's safe for use.
+        $tag = urldecode($tag);
 
 
 
