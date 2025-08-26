@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [STVP](https://mia.kiwi/projects/stvp).
 
-## [Unreleased]
+## [25.0.4] - 2025-08-26
 
 ### Added
 
@@ -27,6 +27,7 @@ and this project adheres to [STVP](https://mia.kiwi/projects/stvp).
 - `getPostsByMetadata` method to `PostsContainerInterface` to get posts based on their metadata
 - `filterPosts` method to `PostsContainerInterface` to filter a set of posts based on a number of criteria
 - `PostsContainer` abstract class to hold common methods not reliant on the storage implementation
+- Unlisted posts
 
 ### Changed
 

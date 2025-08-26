@@ -3,6 +3,7 @@
 namespace Miakiwi\Kiwiquill\Models;
 
 use Lukaswhite\FeedWriter\Entities\Rss\Item;
+use Miakiwi\Kiwiquill\Enums\PostVisibility;
 use Miakiwi\Kiwiquill\PostMetadata;
 use MiaKiwi\Kaphpir\IData;
 use Miakiwi\Kiwiquill\Slugificator;
@@ -179,6 +180,13 @@ class Post implements IData
 
         // Return the body as a string.
         return $body;
+    }
+
+
+
+    public function isUnlisted(): bool
+    {
+        return $this->metadata->getVisibility() === PostVisibility::UNLISTED;
     }
 
 

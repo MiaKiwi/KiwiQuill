@@ -17,6 +17,17 @@ use Miakiwi\Kiwiquill\Exceptions\PostsContainerNotFoundError;
 class PostsController
 {
     /**
+     * Discard unlisted posts from the given array of posts.
+     * @param \Miakiwi\Kiwiquill\Models\Post[] $posts The array of posts to filter.
+     * @return \Miakiwi\Kiwiquill\Models\Post[] The filtered array of posts.
+     */
+    static function discardUnlistedPosts(array $posts): array
+    {
+        return array_filter($posts, fn($post) => !$post->isUnlisted());
+    }
+
+
+    /**
      * Handles the request to retrieve all posts.
      * @return never
      */
@@ -47,6 +58,9 @@ class PostsController
 
         // Get all the posts from the container.
         $posts = $container->getPosts();
+
+        // Ignore unlisted posts
+        $posts = static::discardUnlistedPosts($posts);
 
 
 
@@ -131,6 +145,9 @@ class PostsController
 
         // Get all the posts from the container.
         $posts = $container->getPosts();
+
+        // Ignore unlisted posts
+        $posts = static::discardUnlistedPosts($posts);
 
 
 
@@ -221,7 +238,7 @@ class PostsController
 
 
 
-        // Get the post by its path.
+        // Get the post by its path (including unlisted posts).
         $post = $container->getPostByPath($path);
 
 
@@ -282,7 +299,7 @@ class PostsController
 
 
 
-        // Get the post by its path.
+        // Get the post by its path (including unlisted posts).
         $post = $container->getPostByPath($path);
 
 
@@ -343,7 +360,7 @@ class PostsController
 
 
 
-        // Get the post by its ID.
+        // Get the post by its ID (including unlisted posts).
         $post = $container->getPostById($id);
 
 
@@ -434,6 +451,10 @@ class PostsController
             $author,
             $path
         );
+
+        // Ignore unlisted posts
+        $posts = static::discardUnlistedPosts($posts);
+
 
 
         Logger::get()->debug("Posts found after filtering", [

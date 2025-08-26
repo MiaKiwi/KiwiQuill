@@ -47,6 +47,9 @@ class FeedController
         // Get all the posts from the container.
         $posts = $container->getPosts();
 
+        // Ignore unlisted posts
+        $posts = PostsController::discardUnlistedPosts($posts);
+
 
 
         // Create a new RSS feed.
@@ -125,6 +128,9 @@ class FeedController
 
         // Get all the posts with that tag from the container.
         $posts = $container->getPostsByTags([$tag]);
+
+        // Ignore unlisted posts
+        $posts = PostsController::discardUnlistedPosts($posts);
 
 
 

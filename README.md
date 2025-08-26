@@ -1,20 +1,3 @@
-- [🥝 KiwiQuill – A Markdown blog API](#-kiwiquill--a-markdown-blog-api)
-  - [Posts](#posts)
-    - [Reserved metadata attributes](#reserved-metadata-attributes)
-  - [Developer stuff (scary)](#developer-stuff-scary)
-    - [RSS Feed](#rss-feed)
-    - [API routes](#api-routes)
-      - [List all posts](#list-all-posts)
-      - [Get a specific post by path](#get-a-specific-post-by-path)
-      - [Get only the metadata about a post](#get-only-the-metadata-about-a-post)
-      - [Get a specific post by its identifier](#get-a-specific-post-by-its-identifier)
-      - [Searching for posts](#searching-for-posts)
-    - [API pagination](#api-pagination)
-    - [Adding new post container types](#adding-new-post-container-types)
-
-
----
-
 # 🥝 KiwiQuill – A Markdown blog API
 
 KiwiQuill is a simple, file-based blogging system. Posts are stored in Markdown and served via a REST API.
@@ -32,6 +15,7 @@ Each posts can have metadata attached to it. The attributes are stored in a YAML
 ---
 title: "KiwiQuill Intro"
 date_published: 2025-07-08
+visibility: public
 ---
 
 # 🥝 KiwiQuill – A Markdown blog API
@@ -57,6 +41,15 @@ KiwiQuill has some special metadata attributes it can use to help filter your po
 - `tags`: A list of tags that describe the post.
 - `date_published`: The date the post was first published.
 - `date_updated`: The date of the last revision.
+- `visibility`: The visibility status of the post ("public" or "unlisted")
+
+### Post visibility
+
+You can use the `visibility` metadata attribute to set how the post can be accessed. Posts marked as "public" appear normally in the API, meaning that any user can see and read them, this is the default visibility. Posts set as "unlisted" will only appear if they are searched specifically, either by path or by ID.
+
+Public posts are listed on the "menu" and anybody can "order" them, while unlisted posts are hidden and can only be accessed if you know their secret name.
+
+> **This does not mean that unlisted posts are completely inaccessible, however. Anybody with the link can read them, so don't use unlisted posts for sensitive content!**
 
 ## Developer stuff (scary)
 

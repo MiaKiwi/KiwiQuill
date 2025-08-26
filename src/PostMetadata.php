@@ -4,6 +4,7 @@ namespace Miakiwi\Kiwiquill;
 
 use Framework\Logger;
 use MiaKiwi\Kaphpir\IData;
+use Miakiwi\Kiwiquill\Enums\PostVisibility;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -280,6 +281,16 @@ class PostMetadata implements IData
     public function getTags(array $default = []): array
     {
         return $this->getMetadatum('tags', $default);
+    }
+
+
+
+    public function getVisibility(?PostVisibility $default = null): ?PostVisibility
+    {
+        // Cast the visibility metadata to the PostVisibility enum.
+        $visibility = $this->getMetadatum('visibility');
+
+        return PostVisibility::tryFrom(strtolower($visibility)) ?? $default;
     }
 
 
