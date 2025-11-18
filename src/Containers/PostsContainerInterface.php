@@ -36,6 +36,15 @@ interface PostsContainerInterface
 
 
     /**
+     * Get posts that have a matching path.
+     * @param string $path The path to match against the posts.
+     * @return \Miakiwi\Kiwiquill\Models\Post[] The posts with the specified path.
+     */
+    public function getPostsByMatchingPath(string $path): array;
+
+
+
+    /**
      * Get posts by their tags.
      * @param string[] $tags The tags to filter posts by (combined with OR logic).
      * @return \Miakiwi\Kiwiquill\Models\Post[] The posts with the specified tags.
@@ -77,6 +86,29 @@ interface PostsContainerInterface
      * @return \Miakiwi\Kiwiquill\Models\Post[] The posts with the specified last update date.
      */
     public function getPostsByUpdateDate(DateTime $date): array;
+
+
+
+    /**
+     * Get posts by their metadata key-value pair.
+     * @param string $key The metadata key to filter posts by.
+     * @param string $value The metadata value to filter posts by.
+     * @return \Miakiwi\Kiwiquill\Models\Post[] The posts with the specified metadata.
+     */
+    public function getPostsByMetadata(string $key, string $value): array;
+
+
+
+    /**
+     * Filter posts based on various criteria.
+     * @param \Miakiwi\Kiwiquill\Models\Post[] $posts The array of posts to filter.
+     * @param mixed $tags The tags to filter posts by (combined with OR logic).
+     * @param mixed $title The title to filter posts by.
+     * @param mixed $author The author to filter posts by.
+     * @param mixed $path The path to filter posts by.
+     * @return \Miakiwi\Kiwiquill\Models\Post[] The filtered posts.
+     */
+    public static function filterPosts(array $posts, ?array $tags = null, ?string $title = null, ?string $author = null, ?string $path = null): array;
 
 
 

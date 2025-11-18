@@ -19,6 +19,9 @@ use Pecee\SimpleRouter\SimpleRouter;
 // Include APIv1 routes
 include_once __DIR__ . DIRECTORY_SEPARATOR . 'Routes' . DIRECTORY_SEPARATOR . 'APIv1.php';
 
+// Include Feed routes
+include_once __DIR__ . DIRECTORY_SEPARATOR . 'Routes' . DIRECTORY_SEPARATOR . 'Feed.php';
+
 
 
 // ----- Errors ----- \\

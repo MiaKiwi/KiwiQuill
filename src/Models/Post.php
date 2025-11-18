@@ -2,7 +2,8 @@
 
 namespace Miakiwi\Kiwiquill\Models;
 
-use Cocur\Slugify\Slugify;
+use Lukaswhite\FeedWriter\Entities\Rss\Item;
+use Miakiwi\Kiwiquill\Enums\PostVisibility;
 use Miakiwi\Kiwiquill\PostMetadata;
 use MiaKiwi\Kaphpir\IData;
 use Miakiwi\Kiwiquill\Slugificator;
@@ -45,6 +46,38 @@ class Post implements IData
         $this->raw_content = $raw_content;
 
         $metadata ? $this->metadata = $metadata : $this->detectMetadata();
+    }
+
+
+
+    /**
+     * Get or extract the title of the post.
+     * Get the title from the metadata or try to extract it from the raw content.
+     * @return string|null
+     */
+    public function getTitle(): ?string
+    {
+        // If a title is declared in the metadata, return it.
+        if ($this->metadata->getTitle(false)) {
+            return $this->metadata->getTitle();
+        }
+
+
+
+        // Otherwise, try to extract it from the raw content.
+        // If the first line is the only line that starts with a hash, use it as the title.
+        $lines_starting_with_hash = preg_grep('/^#\s*(.*)$/m', explode("\n", $this->getRawBody()));
+
+        if (count($lines_starting_with_hash) === 1) {
+            // Get rid of the hash and return the rest of the line as the title.
+            $without_hash = trim(substr($lines_starting_with_hash[0], 1));
+
+            return $without_hash;
+        }
+
+
+
+        return null;
     }
 
 
@@ -150,10 +183,80 @@ class Post implements IData
     }
 
 
+
+    public function isUnlisted(): bool
+    {
+        return $this->metadata->getVisibility() === PostVisibility::UNLISTED;
+    }
+
+
     // TODO: Implement internal HTML conversion.
     // public function getHtmlBody(): string
     // {
     // }
+
+
+
+    /**
+     * Populate an RSS item with the post's metadata.
+     * @param \Lukaswhite\FeedWriter\Entities\Rss\Item $item The RSS item to populate.
+     * @return void
+     */
+    public function populateRssItem(Item &$item): void
+    {
+        // Set the title of the post.
+        $item->title($this->getTitle() ?? 'Untitled Post');
+
+
+
+        // Set the description of the post.
+        $item->description($this->metadata->getDescription() ?? 'No description available.');
+
+
+
+        // Set the link to the post.
+        // Use the ID if it has one, otherwise use the path.
+        if ($this->metadata->getId(false)) {
+            $item->link($_ENV['WEB_POST_ROOT_ID'] . $this->metadata->getId());
+
+            // Also set the GUID of the item.
+            $item->guid($_ENV['WEB_POST_ROOT_ID'] . $this->metadata->getId(), true);
+        } else {
+            $item->link($_ENV['WEB_POST_ROOT_PATH'] . $this->getPath());
+        }
+
+
+
+        // Set the publication date of the post.
+        if ($this->metadata->getPublicationDate()) {
+            $publication_date = new \DateTime($this->metadata->getPublicationDate()->format('Y-m-d H:i:s'));
+
+            $item->pubDate($publication_date);
+        }
+
+
+
+        // Overwrite the publication date if it was modified.
+        if ($this->metadata->getUpdateDate()) {
+            $update_date = new \DateTime($this->metadata->getUpdateDate()->format('Y-m-d H:i:s'));
+
+            $item->pubDate($update_date);
+        }
+
+
+
+        // Set the author of the post.
+        if ($this->metadata->getAuthor() && filter_var($this->metadata->getAuthor(), FILTER_VALIDATE_EMAIL)) {
+            $item->author($this->metadata->getAuthor());
+        }
+
+
+
+        // Add a thumbnail if the post has one.
+        if ($this->metadata->getImage(false)) {
+            $item->addMedia()->url($this->metadata->getImage())->addThumbnail()->url($this->metadata->getImage());
+        }
+    }
 
 
 
@@ -183,9 +286,37 @@ class Post implements IData
 
     public function getKapirValue(): array
     {
+        // Get the post metadata as an array.
+        $meta = $this->metadata->getKapirValue();
+
+
+
+        // Overwrite the title
+        $meta['title'] = $this->getTitle();
+
+
+
         return [
             'raw' => $this->getRawBody(),
-            'metadata' => $this->metadata->getKapirValue()
+            'metadata' => $meta
         ];
+    }
+
+
+
+    public function __toString(): string
+    {
+        // If the post has an ID, return the ID.
+        if ($this->metadata->getId(false)) {
+            return $this->metadata->getId();
+        }
+
+        // If the post has a title, return the title.
+        if ($this->getTitle()) {
+            return $this->getTitle();
+        }
+
+        // Otherwise, return the path to the post file.
+        return $this->getPath();
     }
 }
